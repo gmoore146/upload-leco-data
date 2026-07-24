@@ -1,0 +1,14 @@
+[project]
+name = "upload-leco-data"
+version = "0.1.0"
+description = "Automated background service to monitor incoming C LECO lab outputs"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "watchdog>=4.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

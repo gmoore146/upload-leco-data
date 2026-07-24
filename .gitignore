@@ -1,0 +1,27 @@
+# Local environment secrets (CRITICAL: prevents company paths leaking to GitHub)
+.env
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Virtual environments
+.venv/
+
+# Windows & temporary files
+*.tmp
+~*
+Thumbs.db
+Desktop.ini
+
+# IDEs & Editors
+.vscode/
+.idea/
+
+# MAC files
+.DS_Store
