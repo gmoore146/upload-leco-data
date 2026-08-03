@@ -85,15 +85,15 @@ def process_file(file_path):
     wn_match = WN_PATTERN.search(file_name)
     g400_match = G400_PATTERN.search(file_name)
     
-    # Get the current month formatted as "08 AUGUST"
-    month_folder_name = datetime.datetime.now().strftime("%m %B").upper()
+    # Get the current month formatted as "08 August" (first letter capitalized)
+    month_folder_name = datetime.datetime.now().strftime("%m %B").title()
 
     # Determine target folders based on regex matches
     if wn_match:
         folder_name = wn_match.group(0).upper() 
         onedrive_target = os.path.abspath(os.path.join(ONEDRIVE_DIRECTORY, folder_name))
         
-        # Local Processed path includes the month folder (e.g., ...\08 AUGUST\WN123)
+        # Local Processed path includes the month folder (e.g., ...\08 August\WN123)
         processed_target = os.path.abspath(os.path.join(PROCESSED_DIRECTORY, month_folder_name, folder_name))
         
     elif g400_match:
@@ -103,7 +103,7 @@ def process_file(file_path):
         # Routes to: Raw Data Files \ G400+ \ G400+-xy
         onedrive_target = os.path.abspath(os.path.join(ONEDRIVE_DIRECTORY, "G400+", folder_name))
         
-        # Local Processed path includes the month folder (e.g., ...\08 AUGUST\G400+\G400+-01)
+        # Local Processed path includes the month folder (e.g., ...\08 August\G400+\G400+-01)
         processed_target = os.path.abspath(os.path.join(PROCESSED_DIRECTORY, month_folder_name, "G400+", folder_name))
         
     else:
