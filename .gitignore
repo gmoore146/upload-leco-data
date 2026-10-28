@@ -25,3 +25,6 @@ Desktop.ini
 
 # MAC files
 .DS_Store
+
+# Sorter logs
+leco_sorter_log.txt*

@@ -3,8 +3,8 @@
 Automated background service to monitor incoming C LECO lab outputs and organise them into dedicated subfolders within SharePoint/OneDrive.
 
 **Supported Naming Conventions:**
-*   `WNxyz` -> Moves to `Puraffinity - C744\WNxyz\`
-*   `G400Plus-xy`, `G400+-xy`, `G+-xy` -> Moves to `Puraffinity - C744\G400+\G400+-xy\`
+*   `WNxyz` -> Moves to `Project Folder\WNxyz\`
+*   `G400Plus-xy`, `G400+-xy`, `G+-xy` -> Moves to `Project Folder\G400+\G400+-xy\`
 
 ## Requirements
 
@@ -33,7 +33,7 @@ git clone <your-github-repo-url> upload_LECO_data
 cd upload_LECO_data
 ```
 
-*(Note: We run this as a standalone script using `uv`'s inline dependencies, so running `uv sync` or building a virtual environment is not strictly required).*
+*(Note: The start commands below pass dependencies to `uv run` via `--with`, so running `uv sync` is not required.)*
 
 ### 2. Configure Local Environment Variables
 Create your local `.env` file from the example template:
@@ -43,7 +43,8 @@ copy .env.example .env
 Open `.env` in Notepad and set your local directory paths to match the lab PC:
 ```bash
 WATCH_DIRECTORY="C:\Users\leco\Incoming"
-ONEDRIVE_DIRECTORY="C:\Users\leco\OneDrive - Puraffinity\Puraffinity - C744"
+ONEDRIVE_DIRECTORY="C:\Users\leco\OneDrive - Company\Project Folder"
+PROCESSED_DIRECTORY="C:\Users\leco\Desktop\LECO Results\Processed_new"
 ```
 
 ### 3. Setup Desktop Controls (Start/Stop Buttons)
@@ -52,7 +53,7 @@ Create two `.bat` files on the Desktop to easily start and stop the script witho
 **Start_LECO_Sorter.bat**
 ```cmd
 cd C:\Users\leco\upload_LECO_data
-C:\Users\leco\.local\bin\uv.exe run --with watchdog --with python-dotenv pythonw main.py
+C:\Users\leco\.local\bin\uv.exe run --with watchdog --with python-dotenv pythonw src\upload-leco-data\main.py
 ```
 
 **Stop_Sorter.bat** *(Note: If you already made this for another script, it will stop all Python watchers)*
@@ -71,7 +72,7 @@ To run the script quietly in the background every time the PC is logged into:
 4. Set **Trigger** to `When I log on`.
 5. Set **Action** to `Start a program`:
    * **Program/script:** `C:\Users\leco\.local\bin\uv.exe`
-   * **Add arguments:** `run --with watchdog --with python-dotenv pythonw main.py`
+   * **Add arguments:** `run --with watchdog --with python-dotenv pythonw src\upload-leco-data\main.py`
    * **Start in:** `C:\Users\leco\upload_LECO_data`
 6. Click **Finish**.
 
@@ -81,6 +82,20 @@ When new changes are made to the code on GitHub, follow these steps on the lab P
 
 1. Double-click your **Stop_Sorter.bat** on the desktop to kill the current background process.
 2. Update the files:
-   * **If using Manual Download:** Download the new ZIP from GitHub, extract it, and replace the old `main.py` with the new one.
+   * **If using Manual Download:** Download the new ZIP from GitHub, extract it, and replace the old `src\upload-leco-data\main.py` with the new one.
    * **If using Git:** Open Command Prompt, navigate to `C:\Users\leco\upload_LECO_data`, and run `git pull`.
 3. Double-click your **Start_LECO_Sorter.bat** to restart the background script with the new code.
+
+## Logs & Troubleshooting
+
+All activity is logged to `src\upload-leco-data\leco_sorter_log.txt` (rotates at 5 MB, keeps 3 backups).
+The script exits with a logged error at startup if `ONEDRIVE_DIRECTORY` is unset or doesn't exist (e.g. OneDrive not synced).
+Files that fail to process stay in the watch folder and are retried on the next startup.
+
+Also, each file is copied to `PROCESSED_DIRECTORY\<MM Month>\...` and moved to the matching OneDrive folder.
+
+## Tests
+
+```cmd
+uv run --with pytest --with watchdog --with python-dotenv pytest
+```
